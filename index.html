@@ -1,330 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlusCalcu - Beautiful Calculator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .calculator {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .display {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: right;
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            color: white;
-        }
-
-        .previous-operand {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.7);
-            min-height: 1.5rem;
-        }
-
-        .current-operand {
-            font-size: 2.5rem;
-            font-weight: 300;
-            word-wrap: break-word;
-            word-break: break-all;
-        }
-
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        button {
-            border: none;
-            border-radius: 12px;
-            padding: 20px;
-            font-size: 1.3rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        button:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translateY(-2px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .operator {
-            background: rgba(255, 149, 0, 0.8);
-        }
-
-        .operator:hover {
-            background: rgba(255, 149, 0, 0.9);
-        }
-
-        .equals {
-            background: rgba(76, 175, 80, 0.8);
-            grid-column: span 2;
-        }
-
-        .equals:hover {
-            background: rgba(76, 175, 80, 0.9);
-        }
-
-        .clear {
-            background: rgba(244, 67, 54, 0.8);
-        }
-
-        .clear:hover {
-            background: rgba(244, 67, 54, 0.9);
-        }
-
-        .title {
-            text-align: center;
-            color: white;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            font-weight: 300;
-        }
-
-        @media (max-width: 480px) {
-            .calculator {
-                padding: 15px;
-            }
-            button {
-                padding: 15px;
-                font-size: 1.1rem;
-            }
-            .current-operand {
-                font-size: 2rem;
-            }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Plus Calculator</title>
+<!-- home-screen web app (iPhone: Safari → Share → Add to Home Screen) -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plus Calc">
+<meta name="theme-color" content="#000000">
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="calculator">
-        <div class="title">PlusCalcu</div>
-        <div class="display">
-            <div class="previous-operand" id="previous-operand"></div>
-            <div class="current-operand" id="current-operand">0</div>
-        </div>
-        <div class="buttons">
-            <button class="clear" data-action="clear">AC</button>
-            <button data-action="delete">DEL</button>
-            <button data-action="percent">%</button>
-            <button class="operator" data-operator="÷">÷</button>
-            
-            <button data-number="7">7</button>
-            <button data-number="8">8</button>
-            <button data-number="9">9</button>
-            <button class="operator" data-operator="×">×</button>
-            
-            <button data-number="4">4</button>
-            <button data-number="5">5</button>
-            <button data-number="6">6</button>
-            <button class="operator" data-operator="-">−</button>
-            
-            <button data-number="1">1</button>
-            <button data-number="2">2</button>
-            <button data-number="3">3</button>
-            <button class="operator" data-operator="+">+</button>
-            
-            <button data-number="0">0</button>
-            <button data-number=".">.</button>
-            <button class="equals" data-action="equals">=</button>
-        </div>
+<div id="app">
+  <div id="tapeArea">
+    <div id="tapeWrap"><div id="tape"></div></div>
+    <!-- GST mode: big breakdown card over the top-left of the tape -->
+    <div id="gstPanel"></div>
+  </div>
+
+  <div id="display">
+    <div id="dispTop"><span id="dispName"></span><span id="dispMode"></span></div>
+    <div id="dispFmt">Standard</div>
+    <div id="dispTotal">0</div>
+    <div id="grabber"></div>
+    <div id="dispEntryRow"><span id="dispOp"></span><span id="dispEntry">0</span><span id="caret"></span></div>
+  </div>
+
+  <!-- GST keys as a row above the keypad (web app default); the column version lives inside the keypad -->
+  <div id="gstRow">
+    <button class="k gst gsw" data-k="gstmode" aria-label="GST mode on/off"><b>GST</b><span class="tg"></span></button>
+    <button class="k gst" data-k="gstadd"><b>+GST</b></button>
+    <button class="k gst" data-k="gstrem"><b>−GST</b></button>
+    <button class="k gst" data-k="gstamt"><b>GST</b><small>amount</small></button>
+    <button class="k gst" data-k="gstslab"><b class="slabV">18%</b><small>slab</small></button>
+  </div>
+
+  <div id="keypad">
+    <div id="fnPane">
+      <div class="fnPage" data-page="0">
+        <button class="k fn" data-k="delrow" aria-label="Delete last row"></button>
+        <button class="k fn" data-k="back" aria-label="Backspace"></button>
+        <button class="k fn" data-k="clearall" aria-label="Clear tape"></button>
+        <button class="k fn" data-k="clear" aria-label="Clear"></button>
+        <button class="k fn" data-k="mem" aria-label="Memory"></button>
+        <button class="k fn" data-k="neg" aria-label="Plus minus"></button>
+        <button class="k fn" data-k="tapes" aria-label="Tapes"></button>
+        <button class="k fn" data-k="pct" aria-label="Percent"></button>
+      </div>
+      <div class="fnPage" data-page="1">
+        <button class="k fn t" data-k="sin">sin</button>
+        <button class="k fn t" data-k="sq">x²</button>
+        <button class="k fn t" data-k="cos">cos</button>
+        <button class="k fn t" data-k="cube">x³</button>
+        <button class="k fn t" data-k="tan">tan</button>
+        <button class="k fn t" data-k="pow">xʸ</button>
+        <button class="k fn t" data-k="inv">1/x</button>
+        <button class="k fn t" data-k="pi">π</button>
+      </div>
+      <div class="fnPage" data-page="2">
+        <button class="k fn t" data-k="sqrt">√x</button>
+        <button class="k fn t" data-k="e">e</button>
+        <button class="k fn t" data-k="cbrt">∛x</button>
+        <button class="k fn t" data-k="ln">ln</button>
+        <button class="k fn t" data-k="root">ʸ√x</button>
+        <button class="k fn t" data-k="log">log</button>
+        <button class="k fn t" data-k="angle">deg</button>
+        <button class="k fn t" data-k="fact">n!</button>
+      </div>
+      <div id="pageDots"><i></i><i></i><i></i></div>
     </div>
+    <div id="gstCol">
+      <button class="k gst" data-k="gstadd"><b>+GST</b></button>
+      <button class="k gst" data-k="gstrem"><b>−GST</b></button>
+      <button class="k gst" data-k="gstamt"><b>GST</b><small>amount</small></button>
+      <button class="k gst" data-k="gstslab"><b class="slabV">18%</b><small>slab</small></button>
+    </div>
+    <div id="numPane">
+      <div id="digits">
+        <button class="k d" data-k="7">7</button><button class="k d" data-k="8">8</button><button class="k d" data-k="9">9</button>
+        <button class="k d" data-k="4">4</button><button class="k d" data-k="5">5</button><button class="k d" data-k="6">6</button>
+        <button class="k d" data-k="1">1</button><button class="k d" data-k="2">2</button><button class="k d" data-k="3">3</button>
+        <div class="zero-row">
+          <button class="k d zero" data-k="0">0</button>
+          <button class="k d dot" data-k=".">.</button>
+        </div>
+      </div>
+      <!-- 6th column: one dedicated full-height + key; 7th column: ÷ × − -->
+      <div id="plusCol"><button class="k op plus" data-k="+"></button></div>
+      <div id="opCol">
+        <button class="k op small" data-k="÷"></button>
+        <button class="k op small" data-k="×"></button>
+        <button class="k op small" data-k="−"></button>
+        <button class="k op" data-k="="></button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        class Calculator {
-            constructor() {
-                this.previousOperandElement = document.getElementById('previous-operand');
-                this.currentOperandElement = document.getElementById('current-operand');
-                this.clear();
-                this.setupEventListeners();
-            }
+  <div id="toolbar">
+    <button data-t="share" aria-label="Export"></button>
+    <button data-t="settings" aria-label="Settings"></button>
+    <button data-t="themes" aria-label="Themes"></button>
+    <button data-t="tips" aria-label="Tips"></button>
+    <button data-t="help" aria-label="Help"></button>
+  </div>
 
-            clear() {
-                this.currentOperand = '0';
-                this.previousOperand = '';
-                this.operation = undefined;
-                this.updateDisplay();
-            }
+  <div id="commentBar"><button id="cbPrev">Previous</button><button id="cbNext">Next</button><span></span><button id="cbDone">Done</button></div>
+</div>
 
-            delete() {
-                if (this.currentOperand === '0') return;
-                this.currentOperand = this.currentOperand.slice(0, -1);
-                if (this.currentOperand === '') this.currentOperand = '0';
-                this.updateDisplay();
-            }
+<div id="pop" class="hidden"></div>
+<div id="sheetBack" class="hidden"><div id="sheet"></div></div>
+<div id="toast" class="hidden"></div>
 
-            appendNumber(number) {
-                if (number === '.' && this.currentOperand.includes('.')) return;
-                if (this.currentOperand === '0' && number !== '.') {
-                    this.currentOperand = number;
-                } else {
-                    this.currentOperand += number;
-                }
-                this.updateDisplay();
-            }
-
-            chooseOperation(operation) {
-                if (this.currentOperand === '') return;
-                if (this.previousOperand !== '') {
-                    this.compute();
-                }
-                this.operation = operation;
-                this.previousOperand = this.currentOperand;
-                this.currentOperand = '';
-                this.updateDisplay();
-            }
-
-            compute() {
-                let computation;
-                const prev = parseFloat(this.previousOperand);
-                const current = parseFloat(this.currentOperand);
-                if (isNaN(prev) || isNaN(current)) return;
-
-                switch (this.operation) {
-                    case '+':
-                        computation = prev + current;
-                        break;
-                    case '-':
-                        computation = prev - current;
-                        break;
-                    case '×':
-                        computation = prev * current;
-                        break;
-                    case '÷':
-                        computation = current !== 0 ? prev / current : 'Error';
-                        break;
-                    default:
-                        return;
-                }
-
-                this.currentOperand = computation.toString();
-                this.operation = undefined;
-                this.previousOperand = '';
-                this.updateDisplay();
-            }
-
-            percent() {
-                this.currentOperand = (parseFloat(this.currentOperand) / 100).toString();
-                this.updateDisplay();
-            }
-
-            updateDisplay() {
-                this.currentOperandElement.innerText = this.formatNumber(this.currentOperand);
-                if (this.operation != null) {
-                    this.previousOperandElement.innerText = 
-                        `${this.formatNumber(this.previousOperand)} ${this.operation}`;
-                } else {
-                    this.previousOperandElement.innerText = '';
-                }
-            }
-
-            formatNumber(number) {
-                if (number === 'Error') return 'Error';
-                const stringNumber = number.toString();
-                const integerDigits = parseFloat(stringNumber.split('.')[0]);
-                const decimalDigits = stringNumber.split('.')[1];
-                let integerDisplay;
-                
-                if (isNaN(integerDigits)) {
-                    integerDisplay = '';
-                } else {
-                    integerDisplay = integerDigits.toLocaleString('en', {
-                        maximumFractionDigits: 0
-                    });
-                }
-                
-                if (decimalDigits != null) {
-                    return `${integerDisplay}.${decimalDigits}`;
-                } else {
-                    return integerDisplay;
-                }
-            }
-
-            setupEventListeners() {
-                document.querySelectorAll('[data-number]').forEach(button => {
-                    button.addEventListener('click', () => {
-                        this.appendNumber(button.dataset.number);
-                    });
-                });
-
-                document.querySelectorAll('[data-operator]').forEach(button => {
-                    button.addEventListener('click', () => {
-                        this.chooseOperation(button.dataset.operator);
-                    });
-                });
-
-                document.querySelector('[data-action="equals"]').addEventListener('click', () => {
-                    this.compute();
-                });
-
-                document.querySelector('[data-action="clear"]').addEventListener('click', () => {
-                    this.clear();
-                });
-
-                document.querySelector('[data-action="delete"]').addEventListener('click', () => {
-                    this.delete();
-                });
-
-                document.querySelector('[data-action="percent"]').addEventListener('click', () => {
-                    this.percent();
-                });
-
-                // Keyboard support
-                document.addEventListener('keydown', (e) => {
-                    if (e.key >= '0' && e.key <= '9' || e.key === '.') {
-                        this.appendNumber(e.key);
-                    } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
-                        const operators = {'+': '+', '-': '-', '*': '×', '/': '÷'};
-                        this.chooseOperation(operators[e.key]);
-                    } else if (e.key === 'Enter' || e.key === '=') {
-                        this.compute();
-                    } else if (e.key === 'Escape') {
-                        this.clear();
-                    } else if (e.key === 'Backspace') {
-                        this.delete();
-                    }
-                });
-            }
-        }
-
-        const calculator = new Calculator();
-    </script>
+<script src="app.js"></script>
 </body>
 </html>
